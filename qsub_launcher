@@ -100,7 +100,9 @@ def writeQsubFile(list_jobs_str, list_jobsOutput_folderName, qsubFile, subPathLo
     f.write('#PBS -l nodes=1:ppn=1:gpus=1:k80\n')
     f.write('#PBS -l mem=12GB\n')
     f.write('#PBS -S /bin/bash\n')
-    f.write('#PBS -N ' + os.path.join(subPathLogs, list_jobsOutput_folderName[0]) + '\n')
+    #f.write('#PBS -N ' + os.path.join(subPathLogs, list_jobsOutput_folderName[0]) + '\n')
+    f.write('#PBS -e ' + subPathLogs + '\n')
+    f.write('#PBS -o ' + subPathLogs + '\n')
     f.write('#PBS -M sl174@nyu.edu\n')
     f.write('\n\n\n')
     
