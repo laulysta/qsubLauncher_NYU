@@ -68,6 +68,9 @@ def main():
                 list_folderName_tmp += [valueForArg_tmp] if folderName == '' else [folderName + '-' + valueForArg_tmp]
         list_jobs_str = list_jobs_tmp
         list_jobsOutput_folderName = list_folderName_tmp
+    for i in range(len(list_jobsOutput_folderName)):
+        list_jobsOutput_folderName[i] = str(i)+'_'+list_jobsOutput_folderName[i]
+        #print list_jobsOutput_folderName[i]
           
     # Distribute equally the jobs among the QSUB files and generate those files
     nbJobsTotal = len(list_jobs_str)
