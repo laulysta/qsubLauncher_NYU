@@ -127,7 +127,7 @@ def writeQsubFile(list_jobs_str, list_jobsOutput_folderName, qsubFile, subPathLo
         f.write(job + ' &> ' + os.path.join(subPathLogs, folderName) + ' &\n')
 
     f.write('\n\n\n')
-    f.write('wait\n')
+    f.write('exit\n')
     f.close()
 
     
