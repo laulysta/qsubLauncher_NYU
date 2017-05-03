@@ -98,14 +98,15 @@ def writeQsubFile(list_jobs_str, list_jobsOutput_folderName, qsubFile, subPathLo
     f = open(qsubFile, 'w')
     f.write('#!/bin/bash\n')
     f.write('#SBATCH --verbose\n')
+    f.write('#SBATCH --job-name=' + list_jobsOutput_folderName[0] + '\n')
     f.write('#SBATCH --partition=gpu\n')
     f.write('#SBATCH --time=' + walltime + '\n')
     f.write('#SBATCH --gres=gpu:k80:1\n')
     f.write('#SBATCH --mem=12GB\n')
     f.write('#SBATCH --nodes=1\n')
     #f.write('#PBS -N ' + os.path.join(subPathLogs, list_jobsOutput_folderName[0]) + '\n')
-    f.write('#SBATCH --error=' + subPathLogs + '\n')
-    f.write('#SBATCH --output=' + subPathLogs + '\n')
+    f.write('#SBATCH --error=' + subPathLogs + '/slurm_%j.err\n')
+    f.write('#SBATCH --output=' + subPathLogs + '/slurm_%j.out\n')
     #f.write('#PBS -M sl174@nyu.edu\n')
     f.write('\n\n\n')
     
@@ -124,10 +125,10 @@ def writeQsubFile(list_jobs_str, list_jobsOutput_folderName, qsubFile, subPathLo
     #f.write('#cd $SRC ; python -u trainAutoEnc2.py 10 80 sigmoid 0.1 vocKL_sarath_german True True > trainAutoEnc2.py-10-80-sigmoid-0.1-vocKL_sarath_german-True-True &\n')
 
     for job, folderName in zip(list_jobs_str, list_jobsOutput_folderName):
-        f.write(job + ' &> ' + os.path.join(subPathLogs, folderName) + ' &\n')
+        f.write(job + ' > ' + os.path.join(subPathLogs, folderName) + ' 2>&1\n')
 
-    f.write('\n\n\n')
-    f.write('exit\n')
+    #f.write('\n\n\n')
+    #f.write('exit\n')
     f.close()
 
     
