@@ -98,7 +98,7 @@ def writeQsubFile(list_jobs_str, list_jobsOutput_folderName, qsubFile, subPathLo
     f = open(qsubFile, 'w')
     f.write('#!/bin/bash\n')
     f.write('#SBATCH --verbose\n')
-    #f.write('#PBS -q ' + queue + '\n')
+    f.write('#SBATCH --partition=gpu\n')
     f.write('#SBATCH --time=' + walltime + '\n')
     f.write('#SBATCH --gres=gpu:k80:1\n')
     f.write('#SBATCH --mem=12GB\n')
