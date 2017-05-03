@@ -89,7 +89,7 @@ def main():
     # Launch the jobs with QSUB
     if not args.doNotLaunchJobs:
         for qsubFile in list_qsubFiles:
-            qsub_output = check_output('qsub ' + qsubFile, shell=True)
+            qsub_output = check_output('sbatch ' + qsubFile, shell=True)
             print qsub_output,
 
 
@@ -97,24 +97,24 @@ def writeQsubFile(list_jobs_str, list_jobsOutput_folderName, qsubFile, subPathLo
     # Creating the file that will be launch by QSUB
     f = open(qsubFile, 'w')
     f.write('#!/bin/bash\n')
-    f.write('#PBS -V\n')
-    f.write('#PBS -q ' + queue + '\n')
-    f.write('#PBS -l walltime=' + walltime + '\n')
-    f.write('#PBS -l nodes=1:ppn=1:gpus=1:k80\n')
-    f.write('#PBS -l mem=12GB\n')
-    f.write('#PBS -S /bin/bash\n')
+    f.write('#SBATCH --verbose\n')
+    #f.write('#PBS -q ' + queue + '\n')
+    f.write('#SBATCH --time=' + walltime + '\n')
+    f.write('#SBATCH --gres=gpu:k80:1\n')
+    f.write('#SBATCH --mem=12GB\n')
+    f.write('#SBATCH --nodes=1\n')
     #f.write('#PBS -N ' + os.path.join(subPathLogs, list_jobsOutput_folderName[0]) + '\n')
-    f.write('#PBS -e ' + subPathLogs + '\n')
-    f.write('#PBS -o ' + subPathLogs + '\n')
-    f.write('#PBS -M sl174@nyu.edu\n')
+    f.write('#SBATCH --error=' + subPathLogs + '\n')
+    f.write('#SBATCH --output=' + subPathLogs + '\n')
+    #f.write('#PBS -M sl174@nyu.edu\n')
     f.write('\n\n\n')
     
     f.write('module purge\n')
-    f.write('module load theano/0.8.2\n')
-    f.write('module load nltk/3.2.1\n')
-    f.write('module load scikit-learn/intel/0.18\n')
-    f.write('module load cuda/7.5.18\n')
-    f.write('module load cudnn/7.5v5.0\n')
+    f.write('module load theano/0.9.0\n')
+    f.write('module load nltk/3.2.2\n')
+    f.write('module load scikit-learn/intel/0.18.1\n')
+    f.write('module load cuda/8.0.44\n')
+    f.write('module load cudnn/8.0v5.1\n')
     f.write('\n\n\n')
 
     f.write('SRC=' + currentDir + '\n')
