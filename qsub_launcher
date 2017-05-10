@@ -90,7 +90,7 @@ def main():
         if end > nbJobsTotal:
             end = nbJobsTotal
         qsubFile = os.path.join(pathQsubFolder, 'jobCommands_' + str(i) + '.sh')
-        writeQsubFile(list_jobs_str[start:end], list_jobsOutput_folderName[start:end], qsubFile, subPathLogs, args.queue, args.time, currentDir)
+        writeQsubFile(list_jobs_str[start:end], list_jobsOutput_folderName[start:end], qsubFile, subPathLogs, args.queue, args.time, currentDir, args.processor)
         list_qsubFiles += [qsubFile]
 
     # Launch the jobs with QSUB
@@ -100,13 +100,13 @@ def main():
             print qsub_output,
 
 
-def writeQsubFile(list_jobs_str, list_jobsOutput_folderName, qsubFile, subPathLogs, queue, walltime, currentDir):
+def writeQsubFile(list_jobs_str, list_jobsOutput_folderName, qsubFile, subPathLogs, queue, walltime, currentDir, processorOpt):
     # Creating the file that will be launch by QSUB
     f = open(qsubFile, 'w')
     f.write('#!/bin/bash\n')
     f.write('#SBATCH --verbose\n')
     f.write('#SBATCH --job-name=' + list_jobsOutput_folderName[0] + '\n')
-    if args.processor != 'cpu':
+    if processorOpt != 'cpu':
         f.write('#SBATCH --partition=gpu\n')
         f.write('#SBATCH --gres=gpu:'+str(args.processor)+':1\n')
     f.write('#SBATCH --time=' + walltime + '\n')
