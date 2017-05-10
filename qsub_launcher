@@ -13,6 +13,7 @@ def main():
     parser.add_argument('-t', '--time', required=False, default='160:00:00', help='Time we need for the jobs')
     parser.add_argument('-n', '--nbCore', required=False, help='Set the number of core by nodes')
     parser.add_argument('-x', '--doNotLaunchJobs', action='store_true', help='Create the QSUB files but dont launch them')
+    parser.add_argument('-p', '--processor', required=False, default='p1080', help='ex: cpu, k80, p1080')
     parser.add_argument("commandAndOptions", help="Options for the command", nargs=argparse.REMAINDER)
     args = parser.parse_args()
     
@@ -23,6 +24,12 @@ def main():
         nbCoreByNode = 1
     else:
         nbCoreByNode = 1
+
+    # options
+    prcessor_list = ['cpu', 'k80', 'p1080']
+    if args.processor not in prcessor_list:
+        sys.exit('Wrong processor option')
+
     #pdb.set_trace()
     # list_commandAndOptions must be a list of lists
     list_commandAndOptions = []
@@ -99,9 +106,10 @@ def writeQsubFile(list_jobs_str, list_jobsOutput_folderName, qsubFile, subPathLo
     f.write('#!/bin/bash\n')
     f.write('#SBATCH --verbose\n')
     f.write('#SBATCH --job-name=' + list_jobsOutput_folderName[0] + '\n')
-    f.write('#SBATCH --partition=gpu\n')
+    if args.processor != 'cpu'
+        f.write('#SBATCH --partition=gpu\n')
+        f.write('#SBATCH --gres=gpu:'+str(args.processor)+':1\n')
     f.write('#SBATCH --time=' + walltime + '\n')
-    f.write('#SBATCH --gres=gpu:k80:1\n')
     f.write('#SBATCH --mem=12GB\n')
     f.write('#SBATCH --nodes=1\n')
     #f.write('#PBS -N ' + os.path.join(subPathLogs, list_jobsOutput_folderName[0]) + '\n')
