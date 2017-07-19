@@ -110,7 +110,7 @@ def writeQsubFile(list_jobs_str, list_jobsOutput_folderName, qsubFile, subPathLo
         f.write('#SBATCH --partition=gpu\n')
         f.write('#SBATCH --gres=gpu:'+str(processorOpt)+':1\n')
     f.write('#SBATCH --time=' + walltime + '\n')
-    f.write('#SBATCH --mem=12GB\n')
+    f.write('#SBATCH --mem=32GB\n')
     f.write('#SBATCH --nodes=1\n')
     #f.write('#PBS -N ' + os.path.join(subPathLogs, list_jobsOutput_folderName[0]) + '\n')
     f.write('#SBATCH --error=' + subPathLogs + '/slurm_%j.err\n')
@@ -124,6 +124,7 @@ def writeQsubFile(list_jobs_str, list_jobsOutput_folderName, qsubFile, subPathLo
     f.write('module load scikit-learn/intel/0.18.1\n')
     f.write('module load cuda/8.0.44\n')
     f.write('module load cudnn/8.0v5.1\n')
+    f.write('module load libgpuarray/intel/0.6.5\n')
     f.write('\n\n\n')
 
     f.write('SRC=' + currentDir + '\n')
