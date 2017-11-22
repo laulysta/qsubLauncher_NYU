@@ -46,11 +46,11 @@ def main():
     # Creating the folder in 'LOGS_QSUB' where the info will be saved
     nameFolderSavingLogs = ''
     for argument in list_commandAndOptions:
-        str_tmp = argument[0][-30:] + ('' if len(argument) == 1 else ('-' + argument[-1][-30:]))
+        str_tmp = argument[0][:60] + ('' if len(argument) == 1 else ('-' + argument[-1][:60]))
         str_tmp = str_tmp.split('/')[-1] # Deal with path as parameter
         nameFolderSavingLogs += str_tmp if nameFolderSavingLogs == '' else ('_' + str_tmp)
     current_time = datetime.datetime.now()
-    nameFolderSavingLogs = current_time.isoformat() + '__' + nameFolderSavingLogs[:220] #No more than 256 character
+    nameFolderSavingLogs = nameFolderSavingLogs[:220] + '__' + current_time.isoformat()[:-7] #No more than 256 character
     subPathLogs = os.path.join(pathLogs, nameFolderSavingLogs)
     if not os.path.exists(subPathLogs):
         os.makedirs(subPathLogs)
@@ -69,7 +69,7 @@ def main():
         for valueForArg in argument:
             for job_str, folderName in zip(list_jobs_str, list_jobsOutput_folderName):
                 list_jobs_tmp += [job_str + ' ' + valueForArg]
-                valueForArg_tmp = valueForArg[-30:].split('/')[-1]  # Deal with path as parameter
+                valueForArg_tmp = valueForArg[:200].split('/')[-1]  # Deal with path as parameter
                 list_folderName_tmp += [valueForArg_tmp] if folderName == '' else [folderName + '-' + valueForArg_tmp]
         list_jobs_str = list_jobs_tmp
         list_jobsOutput_folderName = list_folderName_tmp
