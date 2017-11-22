@@ -10,24 +10,22 @@ def main():
     # Parse the arguments
     parser = argparse.ArgumentParser()
     parser.add_argument('-q', '--queue', required=False, default='s48', help='Queue used (ex: qwork@mp2, qfat256@mp2, qfat512@mp2)')
-    parser.add_argument('-t', '--time', required=False, default='160:00:00', help='Time we need for the jobs')
-    parser.add_argument('-n', '--nbCore', required=False, help='Set the number of core by nodes')
+    parser.add_argument('-t', '--time', required=False, default='168:00:00', help='Time we need for the jobs')
+    parser.add_argument('-n', '--nbCore', required=False, default=1, help='Set the number of core by nodes')
+    parser.add_argument('--tasks_per_node', required=False, default=2)
     parser.add_argument('-x', '--doNotLaunchJobs', action='store_true', help='Create the QSUB files but dont launch them')
-    parser.add_argument('-p', '--processor', required=False, default='p1080', help='ex: cpu, k80, p1080')
+    parser.add_argument('-p', '--processor', required=False, default='1080ti', help='ex: cpu, k80, p1080')
+    parser.add_argument('--qos', required=False, default='interactive', help='interactive or batch')
+    parser.add_argument('-c', '--cluster', default='cassio', help='cassio or prince')
     parser.add_argument("commandAndOptions", help="Options for the command", nargs=argparse.REMAINDER)
     args = parser.parse_args()
     
     # Define the number of core by nodes for a specific cluster
-    if args.nbCore != None:
-        nbCoreByNode = int(args.nbCore)    
-    elif args.queue == 's48':
-        nbCoreByNode = 1
-    else:
-        nbCoreByNode = 1
+    nbCoreByNode = int(args.nbCore)    
 
     # options
-    prcessor_list = ['cpu', 'k80', 'p1080', 'p40', 'p100']
-    if args.processor not in prcessor_list:
+    processor_list = ['cpu', '1080ti', 'titanxp', 'titanblack', 'k40', 'k20', 'k20x', 'm2090', 'k80', 'p1080', 'p40', 'p100']
+    if args.processor not in processor_list:
         sys.exit('Wrong processor option')
 
     #pdb.set_trace()
@@ -90,7 +88,8 @@ def main():
         if end > nbJobsTotal:
             end = nbJobsTotal
         qsubFile = os.path.join(pathQsubFolder, 'jobCommands_' + str(i) + '.sh')
-        writeQsubFile(list_jobs_str[start:end], list_jobsOutput_folderName[start:end], qsubFile, subPathLogs, args.queue, args.time, currentDir, args.processor)
+        writeQsubFile(list_jobs_str[start:end], list_jobsOutput_folderName[start:end], qsubFile, subPathLogs, args.queue, args.time, currentDir, args.processor,
+                args.tasks_per_node, args.qos, args.cluster)
         list_qsubFiles += [qsubFile]
 
     # Launch the jobs with QSUB
@@ -100,7 +99,7 @@ def main():
             print qsub_output,
 
 
-def writeQsubFile(list_jobs_str, list_jobsOutput_folderName, qsubFile, subPathLogs, queue, walltime, currentDir, processorOpt):
+def writeQsubFile(list_jobs_str, list_jobsOutput_folderName, qsubFile, subPathLogs, queue, walltime, currentDir, processorOpt, tasks_per_node, qos, cluster):
     # Creating the file that will be launch by QSUB
     f = open(qsubFile, 'w')
     f.write('#!/bin/bash\n')
@@ -111,20 +110,24 @@ def writeQsubFile(list_jobs_str, list_jobsOutput_folderName, qsubFile, subPathLo
     f.write('#SBATCH --time=' + walltime + '\n')
     f.write('#SBATCH --mem=32GB\n')
     f.write('#SBATCH --nodes=1\n')
+    f.write('#SBATCH --tasks-per-node=' + str(tasks_per_node) + '\n')
     #f.write('#PBS -N ' + os.path.join(subPathLogs, list_jobsOutput_folderName[0]) + '\n')
     f.write('#SBATCH --error=' + subPathLogs + '/slurm_%j.err\n')
     f.write('#SBATCH --output=' + subPathLogs + '/slurm_%j.out\n')
     #f.write('#PBS -M sl174@nyu.edu\n')
+    if cluster == 'cassio':
+        f.write('#SBATCH --qos=' + qos + '\n')
     f.write('\n\n\n')
     
-    f.write('module purge\n')
-    f.write('module load theano/0.9.0\n')
-    f.write('module load nltk/3.2.2\n')
-    f.write('module load scikit-learn/intel/0.18.1\n')
-    f.write('module load cuda/8.0.44\n')
-    f.write('module load cudnn/8.0v5.1\n')
-    f.write('module load libgpuarray/intel/0.6.5\n')
-    f.write('\n\n\n')
+    if cluster == 'prince':
+        f.write('module purge\n')
+        f.write('module load theano/0.9.0\n')
+        f.write('module load nltk/3.2.2\n')
+        f.write('module load scikit-learn/intel/0.18.1\n')
+        f.write('module load cuda/8.0.44\n')
+        f.write('module load cudnn/8.0v5.1\n')
+        f.write('module load libgpuarray/intel/0.6.5\n')
+        f.write('\n\n\n')
 
     f.write('SRC=' + currentDir + '\n')
     f.write('\n\n\n')
