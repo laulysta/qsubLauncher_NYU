@@ -26,7 +26,7 @@ def main():
         nbCoreByNode = 1
 
     # options
-    prcessor_list = ['cpu', 'k80', 'p1080']
+    prcessor_list = ['cpu', 'k80', 'p1080', 'p40', 'p100']
     if args.processor not in prcessor_list:
         sys.exit('Wrong processor option')
 
@@ -107,7 +107,6 @@ def writeQsubFile(list_jobs_str, list_jobsOutput_folderName, qsubFile, subPathLo
     f.write('#SBATCH --verbose\n')
     f.write('#SBATCH --job-name=' + list_jobsOutput_folderName[0] + '\n')
     if processorOpt != 'cpu':
-        f.write('#SBATCH --partition=gpu\n')
         f.write('#SBATCH --gres=gpu:'+str(processorOpt)+':1\n')
     f.write('#SBATCH --time=' + walltime + '\n')
     f.write('#SBATCH --mem=32GB\n')
